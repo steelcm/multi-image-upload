@@ -1,0 +1,100 @@
+﻿@addTagHelper "*, Microsoft.AspNetCore.Mvc.TagHelpers"
+@model MvcApp.Controllers.IndexViewModel
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ng="http://angularjs.org/" lang="en" ng-app="app">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Demonstration</title>
+
+    <!-- CSS (from CDN) -->
+    <style type="text/css">
+        .image-thumbnail {
+            border: 1px solid red;
+            width: 250px;
+            height: 350px;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            margin-right: 1em;
+            float: left;
+        }
+        
+        .clear {
+            clear: both;
+        }
+    </style>
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.2/html5shiv.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <!-- JS (from CDN) -->
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <form asp-controller="Home" asp-action="Index" enctype="multipart/form-data">
+        <label asp-for="MyName"></label>: <input asp-for="MyName" /><br/>
+        <label asp-for="Files"></label>: <input type="file" id="file-upload" /><br/>
+        <hr/>
+        <div id="gallery-canvas">
+            @for(var i = 0; i < Model.Images.Count(); i++)
+            {
+                var image = Model.Images[i];
+            <div class="image-thumbnail" style="background-image: url(@image.ImageUrl)">
+                <input type="text" name="Images[@i].Id" asp-for="@image.Id" />
+                <input type="text" name="Images[@i].ImageUrl" asp-for="@image.ImageUrl" />
+                <a href="#" class="image-delete-action">Delete</a>
+            </div>
+            }
+        </div>
+        <div class="clear"></div>
+        <hr/>
+        <input type="submit" value="submit" />
+    </form>
+    <script type="text/javascript">
+        function guid() {
+            function s4() {
+                return Math.floor((1 + Math.random()) * 0x10000)
+                    .toString(16)
+                    .substring(1);
+            }
+            return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+                s4() + '-' + s4() + s4() + s4();
+        }
+
+        $(function () {
+            $(document.body).on("click", ".image-delete-action", function (e) {
+                $(this).parent("div").remove();
+                e.preventDefault();
+            });
+
+            $(document.body).on("change", "#file-upload", function(e){
+                var $this = $(this), $clone = $this.clone();
+                var guid  = window.guid();
+                var anyWindow = window.URL || window.webkitURL;
+                if(this.files.length < 1)
+                    return;
+                var objectURL = anyWindow.createObjectURL(this.files[0]);
+                
+                $("#gallery-canvas").append(`
+                    <div class="image-thumbnail" id="`+ guid +`" style="background-image: url(`+ objectURL + `)">
+                        <input type="text"/>
+                        <a href="#"class="image-delete-action">Delete</a>
+                    </div>`);
+
+                $this.after($clone);
+                $this.attr("id", "Files__"+guid+"__");
+                $this.attr("name", "Files");
+                $("#"+guid).append($this);
+            });
+        });
+    </script>
+</body>
+
+</html>
