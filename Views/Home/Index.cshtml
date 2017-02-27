@@ -46,9 +46,11 @@
             @for(var i = 0; i < Model.Images.Count(); i++)
             {
                 var image = Model.Images[i];
+                var index = Guid.NewGuid();
             <div class="image-thumbnail" style="background-image: url(@image.ImageUrl)">
-                <input type="text" name="Images[@i].Id" asp-for="@image.Id" />
-                <input type="text" name="Images[@i].ImageUrl" asp-for="@image.ImageUrl" />
+                <input type="hidden" name="Images.Index" value="@index" />
+                <input type="text" name="Images[@index].Id" asp-for="@image.Id" />
+                <input type="text" name="Images[@index].ImageUrl" asp-for="@image.ImageUrl" />
                 <a href="#" class="image-delete-action">Delete</a>
             </div>
             }
